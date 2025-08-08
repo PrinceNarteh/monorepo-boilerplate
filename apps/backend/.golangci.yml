@@ -3,15 +3,48 @@ version: "2"
 run:
   timeout: 3m
 
+formatters:
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/org/project)
+        - blank
+        - dot
+        - alias
+        - localmodule
+      no-inline-comments: true
+      no-prefix-comments: true
+      custom-order: true
+      no-lex-order: true
+    gofmt:
+      simplify: false
+      rewrite-rules:
+        - pattern: "interface{}"
+          replacement: "any"
+        - pattern: "a[b:len(a)]"
+          replacement: "a[b:]"
+    gofumpt:
+      module-path: github.com/org/project
+      extra-rules: true
+    goimports:
+      local-prefixes:
+        - github.com/org/project
+    golines:
+      max-len: 200
+      tab-len: 8
+      shorten-comments: true
+      reformat-tags: false
+      chain-split-dots: false
+
 linters:
   default: none
   enable:
     - errcheck
-    - gosimple
     - govet
     - ineffassign
     - staticcheck
-    - typecheck
     - unused
     - asasalint
     - asciicheck
@@ -36,7 +69,6 @@ linters:
     - goconst
     - gocritic
     - gocyclo
-    - goimports
     - gomoddirectives
     - gomodguard
     - goprintffuncname
@@ -45,7 +77,6 @@ linters:
     - intrange
     - lll
     - loggercheck
-    - makezero
     - mirror
     - mnd
     - musttag
@@ -68,8 +99,6 @@ linters:
     - sloglint
     - spancheck
     - sqlclosecheck
-    - stylecheck
-
     - testableexamples
     - testifylint
     - testpackage
