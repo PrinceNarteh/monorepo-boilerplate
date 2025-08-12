@@ -18,6 +18,8 @@ import (
 	"honnef.co/go/tools/config"
 )
 
+const DatabasePingTimeout = 10
+
 type Database struct {
 	Pool *pgxpool.Pool
 	log  *zerolog.Logger
@@ -54,8 +56,6 @@ func (mt *multiTracer) TraceQueryEnd(ctx context.Context, conn *pgx.Conn, data p
 		}
 	}
 }
-
-const DatabasePingTimeout = 10
 
 func New(cfg *config.Config, logger *zerolog.Logger, loggerService *loggerConfig.LoggerService) (*Database, error) {
 	hostPort := net.JoinHostPort(cfg.Database.Host, strconv.Itoa(cfg.Database.Port))
