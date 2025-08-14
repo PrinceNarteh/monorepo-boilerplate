@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"net"
 	"net/url"
-	"strconv"
 	"time"
 
+	"github.com/PrinceNarteh/go-boilerplate/internal/config"
 	loggerConfig "github.com/PrinceNarteh/go-boilerplate/internal/logger"
 	pgxzero "github.com/jackc/pgx-zerolog"
 	"github.com/jackc/pgx/v5"
@@ -15,7 +15,6 @@ import (
 	"github.com/jackc/pgx/v5/tracelog"
 	"github.com/newrelic/go-agent/v3/integrations/nrpgx5"
 	"github.com/rs/zerolog"
-	"honnef.co/go/tools/config"
 )
 
 const DatabasePingTimeout = 10
@@ -58,7 +57,7 @@ func (mt *multiTracer) TraceQueryEnd(ctx context.Context, conn *pgx.Conn, data p
 }
 
 func New(cfg *config.Config, logger *zerolog.Logger, loggerService *loggerConfig.LoggerService) (*Database, error) {
-	hostPort := net.JoinHostPort(cfg.Database.Host, strconv.Itoa(cfg.Database.Port))
+	hostPort := net.JoinHostPort(cfg.Database.Host, cfg.Database.Port)
 
 	// URL-encode the password
 	encodedPassword := url.QueryEscape(cfg.Database.Password)
@@ -80,7 +79,7 @@ func New(cfg *config.Config, logger *zerolog.Logger, loggerService *loggerConfig
 		pgxPoolConfig.ConnConfig.Tracer = nrpgx5.NewTracer()
 	}
 
-	if cfg.Primary.Env == "local" {
+	if cfg.Core.Env == "local" {
 		globalLevel := logger.GetLevel()
 		pgxLogger := loggerConfig.NewPgxLogger(globalLevel)
 		// Chain tracers - New Relic first, then local logging

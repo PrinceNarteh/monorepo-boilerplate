@@ -10,7 +10,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/newrelic/go-agent/v3/integrations/logcontext-v2/zerologWriter"
+	// "github.com/newrelic/go-agent/v3/integrations/logcontext-v2/zerologWriter"
 	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/pkgerrors"
@@ -107,12 +107,13 @@ func NewLoggerWithService(cfg *config.ObservabilityConfig, loggerService *Logger
 		baseWriter = os.Stdout
 
 		// Wrap with New Relic zerologWriter for log forwarding in production
-		if loggerService != nil && loggerService.nrApp != nil {
-			nrWriter := zerologWriter.New(baseWriter, loggerService.nrApp)
-			writer = nrWriter
-		} else {
+		// TODO: Re-enable zerologWriter integration when dependency issue is resolved
+		// if loggerService != nil && loggerService.nrApp != nil {
+		// 	nrWriter := zerologWriter.New(baseWriter, loggerService.nrApp)
+		// 	writer = nrWriter
+		// } else {
 			writer = baseWriter
-		}
+		// }
 	} else {
 		// Development mode - use console writer
 		consoleWriter := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: "2006-01-02 15:04:05"}
