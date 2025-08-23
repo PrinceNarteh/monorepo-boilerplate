@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/PrinceNarteh/go-boilerplate/internal/config"
-	// "github.com/PrinceNarteh/go-boilerplate/internal/database" // Uncomment when using database
 	"github.com/PrinceNarteh/go-boilerplate/internal/logger"
 	"github.com/PrinceNarteh/go-boilerplate/internal/middlewares"
 	"github.com/PrinceNarteh/go-boilerplate/internal/routers"

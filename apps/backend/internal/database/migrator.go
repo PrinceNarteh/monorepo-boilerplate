@@ -4,18 +4,20 @@ package database
 import (
 	"context"
 	"embed"
+	"errors"
 	"fmt"
 	"io/fs"
 	"net"
 	"net/url"
 
-	"github.com/PrinceNarteh/go-boilerplate/internal/config"
-	"github.com/jackc/pgx/v5"
+	pgx "github.com/jackc/pgx/v5"
 	tern "github.com/jackc/tern/v2/migrate"
 	"github.com/rs/zerolog"
+
+	"github.com/PrinceNarteh/go-boilerplate/internal/config"
 )
 
-// go:embed migrations/*.sql
+//go:embed migrations/*.sql
 var migrations embed.FS
 
 func Migrate(ctx context.Context, logger *zerolog.Logger, cfg *config.Config) error {
@@ -33,7 +35,7 @@ func Migrate(ctx context.Context, logger *zerolog.Logger, cfg *config.Config) er
 	if err != nil {
 		return err
 	}
-	defer 
+	defer conn.Close(ctx)
 
 	m, err := tern.NewMigrator(ctx, conn, "schema_version")
 	if err != nil {
@@ -45,16 +47,16 @@ func Migrate(ctx context.Context, logger *zerolog.Logger, cfg *config.Config) er
 		return fmt.Errorf("retrieving database migrations subtree: %w", err)
 	}
 
-	if err := m.LoadMigrations(subtree); err != nil {
+	if err = m.LoadMigrations(subtree); err != nil {
 		return fmt.Errorf("loading database migrations: %w", err)
 	}
 
 	from, err := m.GetCurrentVersion(ctx)
 	if err != nil {
-		return fmt.Errorf("retrieving current database migration version")
+		return errors.New("retrieving current database migration version")
 	}
 
-	if err := m.Migrate(ctx); err != nil {
+	if err = m.Migrate(ctx); err != nil {
 		return err
 	}
 

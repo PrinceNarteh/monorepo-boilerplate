@@ -7,18 +7,22 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/PrinceNarteh/go-boilerplate/internal/config"
-	loggerConfig "github.com/PrinceNarteh/go-boilerplate/internal/logger"
 	pgxzero "github.com/jackc/pgx-zerolog"
-	"github.com/jackc/pgx/v5"
+	pgx "github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/tracelog"
 	"github.com/newrelic/go-agent/v3/integrations/nrpgx5"
 	"github.com/rs/zerolog"
+
+	"github.com/PrinceNarteh/go-boilerplate/internal/config"
+	loggerConfig "github.com/PrinceNarteh/go-boilerplate/internal/logger"
 )
 
+// DatabasePingTimeout is the timeout duration for pinging the database
 const DatabasePingTimeout = 10
 
+// Database represents a PostgreSQL database connection pool
+// It holds a connection pool and a logger for logging database operations.
 type Database struct {
 	Pool *pgxpool.Pool
 	log  *zerolog.Logger
@@ -56,6 +60,9 @@ func (mt *multiTracer) TraceQueryEnd(ctx context.Context, conn *pgx.Conn, data p
 	}
 }
 
+// New creates a new Database instance with a connection pool
+// It initializes the connection pool with the provided configuration and logger.
+// It also sets up New Relic instrumentation if a logger service is provided.
 func New(cfg *config.Config, logger *zerolog.Logger, loggerService *loggerConfig.LoggerService) (*Database, error) {
 	hostPort := net.JoinHostPort(cfg.Database.Host, cfg.Database.Port)
 
@@ -121,6 +128,10 @@ func New(cfg *config.Config, logger *zerolog.Logger, loggerService *loggerConfig
 	return database, nil
 }
 
+// Close closes the database connection pool
+// It logs the closure of the connection pool and returns any error encountered.
+// It should be called when the application is shutting down to release resources.
+// It is safe to call this method multiple times.
 func (db *Database) Close() error {
 	db.log.Info().Msg("closing database connection pool")
 	db.Pool.Close()
